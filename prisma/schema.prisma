@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Tournament {
+  id String @id @default(uuid())
+  name String
+  number_of_rounds Int
+  location String?
+  year Int
+
+  rounds Round[]
+  teams Team[]
+  registrations Registration[]
+}
+
+model Player {
+  id String @id @default(uuid())
+  first_name String
+  last_name String
+  handicap_index Float?
+
+  registrations Registration[]
+  scores Score[]
+}
+
+model Course {
+  id String @id @default(uuid())
+  name String
+  location String
+  par Int
+  course_rating Float
+  slope_rating Float
+
+  rounds Round[]
+}
+
+model Round {
+  id String @id @default(uuid())
+  tournament_id String
+  course_id String
+  round_number Int
+  date DateTime
+
+  tournament Tournament @relation(fields: [tournament_id], references: [id])
+  course Course @relation(fields: [course_id], references: [id])
+
+  carts Cart[] 
+}
+
+model Team {
+  id String @id @default(uuid())
+  name String?
+  tournament_id String
+  adjusted_handicap Int
+
+  tournament Tournament @relation(fields: [tournament_id], references: [id])
+
+  registrations Registration[]
+}
+
+model Registration {
+  id String @id @default(uuid())
+  player_id String
+  team_id String
+  tournament_id String
+  full_handicap Int
+  three_quarter_handicap Int
+  adjusted_handicap Int
+
+  player Player @relation(fields: [player_id], references: [id])
+  team Team @relation(fields: [team_id], references: [id])
+  tournament Tournament @relation(fields: [tournament_id], references: [id])
+}
+
+model Cart {
+  id String @id @default(uuid())
+  round_id String
+  cart_name String
+  access_token String @unique
+  tee_time String?
+
+  round Round @relation(fields: [round_id], references: [id])
+  scores Score []
+}
+
+model Score {
+  id String @id @default(uuid())
+  player_id String
+  cart_id String
+  hole_number Int
+  strokes Int
+
+  player Player @relation(fields: [player_id], references: [id])
+  cart Cart @relation(fields: [cart_id], references: [id])
+}
