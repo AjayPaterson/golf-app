@@ -8,7 +8,9 @@ export async function GET() {
         include: {
           player: {
             include: {
-              scores: true,
+              scores: {
+                orderBy: [{ cart_id: "asc" }, { hole_number: "asc" }],
+              },
             },
           },
         },

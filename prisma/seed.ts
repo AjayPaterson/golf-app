@@ -301,6 +301,18 @@ async function main() {
     prisma.cart.create({
       data: { round_id: round(1).id, cart_name: "Cart 4", tee_time: "2:00 PM", access_token: crypto.randomUUID() },
     }),
+    prisma.cart.create({
+      data: { round_id: round(1).id, cart_name: "Cart 5", tee_time: "2:00 PM", access_token: crypto.randomUUID() },
+    }),
+    prisma.cart.create({
+      data: { round_id: round(1).id, cart_name: "Cart 6", tee_time: "2:00 PM", access_token: crypto.randomUUID() },
+    }),
+    prisma.cart.create({
+      data: { round_id: round(1).id, cart_name: "Cart 7", tee_time: "2:00 PM", access_token: crypto.randomUUID() },
+    }),
+    prisma.cart.create({
+      data: { round_id: round(1).id, cart_name: "Cart 8", tee_time: "2:00 PM", access_token: crypto.randomUUID() },
+    }),
 
     // Round 2 - Bootleg Gap (8:03 AM)
     prisma.cart.create({
@@ -314,6 +326,18 @@ async function main() {
     }),
     prisma.cart.create({
       data: { round_id: round(2).id, cart_name: "Cart 4", tee_time: "8:03 AM", access_token: crypto.randomUUID() },
+    }),
+    prisma.cart.create({
+      data: { round_id: round(2).id, cart_name: "Cart 5", tee_time: "8:03 AM", access_token: crypto.randomUUID() },
+    }),
+    prisma.cart.create({
+      data: { round_id: round(2).id, cart_name: "Cart 6", tee_time: "8:03 AM", access_token: crypto.randomUUID() },
+    }),
+    prisma.cart.create({
+      data: { round_id: round(2).id, cart_name: "Cart 7", tee_time: "8:03 AM", access_token: crypto.randomUUID() },
+    }),
+    prisma.cart.create({
+      data: { round_id: round(2).id, cart_name: "Cart 8", tee_time: "8:03 AM", access_token: crypto.randomUUID() },
     }),
 
     // Round 3 - St. Eugene's (8:30 AM)
@@ -329,9 +353,619 @@ async function main() {
     prisma.cart.create({
       data: { round_id: round(3).id, cart_name: "Cart 4", tee_time: "8:30 AM", access_token: crypto.randomUUID() },
     }),
+    prisma.cart.create({
+      data: { round_id: round(3).id, cart_name: "Cart 5", tee_time: "8:30 AM", access_token: crypto.randomUUID() },
+    }),
+    prisma.cart.create({
+      data: { round_id: round(3).id, cart_name: "Cart 6", tee_time: "8:30 AM", access_token: crypto.randomUUID() },
+    }),
+    prisma.cart.create({
+      data: { round_id: round(3).id, cart_name: "Cart 7", tee_time: "8:30 AM", access_token: crypto.randomUUID() },
+    }),
+    prisma.cart.create({
+      data: { round_id: round(3).id, cart_name: "Cart 8", tee_time: "8:30 AM", access_token: crypto.randomUUID() },
+    }),
   ]);
 
   console.log("Created", carts.length, "carts");
+
+  // Cart assignments per round based on Excel data
+  // carts array is ordered: R1:C1-C8, R2:C1-C8, R3:C1-C8
+  // Index:                   0-7,      8-15,      16-23
+
+  const cartAssignments: Record<string, number> = {
+    // Round 1 - Wildstone
+    "Joe-1": 3, // Cart 4 (Joe & Pete)
+    "Scott-1": 5, // Cart 6 (Brock & Scott)
+    "Tyson-1": 0, // Cart 1 (Tyson & Jari)
+    "Clive-1": 6, // Cart 7 (Craig & Clive)
+    "Jari-1": 0, // Cart 1 (Tyson & Jari)
+    "Bert-1": 2, // Cart 3 (Steve & Bert)
+    "Bill-1": 4, // Cart 5 (Bill & Clay)
+    "Steven-1": 2, // Cart 3 (Steve & Bert)
+    "Clayton-1": 4, // Cart 5 (Bill & Clay)
+    "Craig-1": 6, // Cart 7 (Craig & Clive)
+    "Kevin-1": 1, // Cart 2 (Kevin & Dave)
+    "Brian-1": 7, // Cart 8 (Lorne & Brian)
+    "Dave-1": 1, // Cart 2 (Kevin & Dave)
+    "Lorne-1": 7, // Cart 8 (Lorne & Brian)
+    "Pete-1": 3, // Cart 4 (Joe & Pete)
+    "Brock-1": 5, // Cart 6 (Brock & Scott)
+
+    // Round 2 - Bootleg Gap (offset by 8)
+    "Joe-2": 11, // Cart 4 (Joe & Clay)
+    "Scott-2": 12, // Cart 5 (Craig & Scott)
+    "Tyson-2": 9, // Cart 2 (Tyson & Dave)
+    "Clive-2": 14, // Cart 7 (Lorne & Clive)
+    "Jari-2": 10, // Cart 3 (Kevin & Jari)
+    "Bert-2": 13, // Cart 6 (Bert & Brian)
+    "Bill-2": 8, // Cart 1 (Bill & Pete)
+    "Steven-2": 15, // Cart 8 (Brock & Steve)
+    "Clayton-2": 11, // Cart 4 (Joe & Clay)
+    "Craig-2": 12, // Cart 5 (Craig & Scott)
+    "Kevin-2": 10, // Cart 3 (Kevin & Jari)
+    "Brian-2": 13, // Cart 6 (Bert & Brian)
+    "Dave-2": 9, // Cart 2 (Tyson & Dave)
+    "Lorne-2": 14, // Cart 7 (Lorne & Clive)
+    "Pete-2": 8, // Cart 1 (Bill & Pete)
+    "Brock-2": 15, // Cart 8 (Brock & Steve)
+
+    // Round 3 - St. Eugene's (offset by 16)
+    "Joe-3": 16, // Cart 1 (Joe & Jari)
+    "Scott-3": 22, // Cart 7 (Scott & Lorne)
+    "Tyson-3": 23, // Cart 8 (Kevin & Tyson)
+    "Clive-3": 17, // Cart 2 (Bill & Clive)
+    "Jari-3": 16, // Cart 1 (Joe & Jari)
+    "Bert-3": 18, // Cart 3 (Clay & Bert)
+    "Bill-3": 17, // Cart 2 (Bill & Clive)
+    "Steven-3": 19, // Cart 4 (Pete & Steve)
+    "Clayton-3": 18, // Cart 3 (Clay & Bert)
+    "Craig-3": 20, // Cart 5 (Dave & Craig)
+    "Kevin-3": 23, // Cart 8 (Kevin & Tyson)
+    "Brian-3": 21, // Cart 6 (Brock & Brian)
+    "Dave-3": 20, // Cart 5 (Dave & Craig)
+    "Lorne-3": 22, // Cart 7 (Scott & Lorne)
+    "Pete-3": 19, // Cart 4 (Pete & Steve)
+    "Brock-3": 21, // Cart 6 (Brock & Brian)
+  };
+
+  const cartFor = (playerName: string, roundNum: number) => {
+    const index = cartAssignments[`${playerName}-${roundNum}`];
+    return carts[index].id;
+  };
+
+  const scores = await Promise.all([
+    // Joe - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Joe").id,
+          cart_id: cartFor("Joe", 1),
+          hole_number: i + 1,
+          strokes: [6, 6, 4, 6, 5, 3, 4, 5, 6, 6, 5, 3, 6, 4, 4, 7, 5, 6][i],
+        },
+      }),
+    ),
+    // Joe - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Joe").id,
+          cart_id: cartFor("Joe", 2),
+          hole_number: i + 1,
+          strokes: [5, 5, 6, 4, 4, 4, 6, 4, 6, 5, 6, 2, 4, 5, 5, 4, 2, 6][i],
+        },
+      }),
+    ),
+    // Joe - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Joe").id,
+          cart_id: cartFor("Joe", 3),
+          hole_number: i + 1,
+          strokes: [4, 6, 5, 3, 5, 4, 4, 4, 5, 6, 6, 5, 3, 6, 4, 7, 4, 6][i],
+        },
+      }),
+    ),
+    // Scott - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Scott").id,
+          cart_id: cartFor("Scott", 1),
+          hole_number: i + 1,
+          strokes: [8, 5, 4, 5, 4, 4, 5, 2, 5, 6, 4, 4, 6, 4, 4, 5, 4, 4][i],
+        },
+      }),
+    ),
+    // Scott - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Scott").id,
+          cart_id: cartFor("Scott", 2),
+          hole_number: i + 1,
+          strokes: [4, 4, 6, 4, 5, 5, 3, 5, 5, 4, 7, 2, 5, 3, 4, 5, 5, 5][i],
+        },
+      }),
+    ),
+    // Scott - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Scott").id,
+          cart_id: cartFor("Scott", 3),
+          hole_number: i + 1,
+          strokes: [4, 6, 4, 4, 4, 3, 3, 4, 6, 4, 6, 3, 3, 3, 3, 7, 4, 5][i],
+        },
+      }),
+    ),
+    // Tyson - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Tyson").id,
+          cart_id: cartFor("Tyson", 1),
+          hole_number: i + 1,
+          strokes: [6, 5, 4, 5, 4, 3, 6, 3, 4, 6, 6, 4, 6, 4, 4, 3, 4, 5][i],
+        },
+      }),
+    ),
+    // Tyson - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Tyson").id,
+          cart_id: cartFor("Tyson", 2),
+          hole_number: i + 1,
+          strokes: [4, 5, 4, 3, 6, 4, 4, 4, 5, 5, 4, 3, 5, 4, 5, 5, 3, 5][i],
+        },
+      }),
+    ),
+    // Tyson - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Tyson").id,
+          cart_id: cartFor("Tyson", 3),
+          hole_number: i + 1,
+          strokes: [4, 6, 4, 4, 5, 6, 3, 5, 5, 6, 5, 5, 3, 4, 3, 6, 3, 5][i],
+        },
+      }),
+    ),
+    // Clive - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Clive").id,
+          cart_id: cartFor("Clive", 1),
+          hole_number: i + 1,
+          strokes: [7, 4, 4, 6, 4, 4, 5, 4, 5, 6, 6, 4, 7, 6, 4, 4, 5, 5][i],
+        },
+      }),
+    ),
+    // Clive - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Clive").id,
+          cart_id: cartFor("Clive", 2),
+          hole_number: i + 1,
+          strokes: [5, 6, 4, 3, 7, 5, 3, 5, 5, 5, 6, 5, 5, 5, 6, 4, 4, 9][i],
+        },
+      }),
+    ),
+    // Clive - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Clive").id,
+          cart_id: cartFor("Clive", 3),
+          hole_number: i + 1,
+          strokes: [6, 5, 5, 3, 5, 4, 4, 5, 6, 6, 5, 6, 4, 6, 3, 6, 4, 5][i],
+        },
+      }),
+    ),
+    // Jari - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Jari").id,
+          cart_id: cartFor("Jari", 1),
+          hole_number: i + 1,
+          strokes: [6, 4, 5, 5, 4, 3, 6, 3, 6, 6, 6, 5, 6, 4, 3, 4, 5, 7][i],
+        },
+      }),
+    ),
+    // Jari - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Jari").id,
+          cart_id: cartFor("Jari", 2),
+          hole_number: i + 1,
+          strokes: [5, 6, 5, 4, 5, 4, 3, 4, 5, 5, 4, 6, 6, 4, 7, 5, 4, 5][i],
+        },
+      }),
+    ),
+    // Jari - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Jari").id,
+          cart_id: cartFor("Jari", 3),
+          hole_number: i + 1,
+          strokes: [4, 4, 3, 3, 7, 5, 4, 5, 7, 5, 5, 5, 3, 4, 3, 5, 3, 5][i],
+        },
+      }),
+    ),
+    // Bert - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Bert").id,
+          cart_id: cartFor("Bert", 1),
+          hole_number: i + 1,
+          strokes: [6, 5, 4, 6, 4, 3, 5, 2, 6, 7, 5, 6, 7, 5, 3, 2, 6, 5][i],
+        },
+      }),
+    ),
+    // Bert - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Bert").id,
+          cart_id: cartFor("Bert", 2),
+          hole_number: i + 1,
+          strokes: [3, 6, 5, 4, 8, 6, 3, 4, 5, 5, 5, 3, 4, 4, 6, 5, 4, 7][i],
+        },
+      }),
+    ),
+    // Bert - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Bert").id,
+          cart_id: cartFor("Bert", 3),
+          hole_number: i + 1,
+          strokes: [5, 5, 4, 5, 4, 4, 4, 4, 5, 5, 5, 5, 3, 3, 4, 6, 3, 6][i],
+        },
+      }),
+    ),
+    // Bill - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Bill").id,
+          cart_id: cartFor("Bill", 1),
+          hole_number: i + 1,
+          strokes: [6, 6, 4, 5, 5, 4, 5, 5, 6, 5, 5, 4, 6, 5, 4, 4, 5, 5][i],
+        },
+      }),
+    ),
+    // Bill - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Bill").id,
+          cart_id: cartFor("Bill", 2),
+          hole_number: i + 1,
+          strokes: [4, 6, 5, 4, 4, 5, 3, 4, 4, 4, 4, 3, 5, 4, 5, 4, 4, 5][i],
+        },
+      }),
+    ),
+    // Bill - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Bill").id,
+          cart_id: cartFor("Bill", 3),
+          hole_number: i + 1,
+          strokes: [4, 5, 4, 4, 4, 5, 3, 3, 5, 5, 4, 5, 3, 5, 3, 6, 3, 6][i],
+        },
+      }),
+    ),
+    // Steven - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Steven").id,
+          cart_id: cartFor("Steven", 1),
+          hole_number: i + 1,
+          strokes: [5, 5, 4, 4, 4, 5, 5, 3, 6, 7, 4, 4, 6, 4, 2, 5, 6, 4][i],
+        },
+      }),
+    ),
+    // Steven - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Steven").id,
+          cart_id: cartFor("Steven", 2),
+          hole_number: i + 1,
+          strokes: [4, 5, 5, 4, 4, 4, 3, 4, 8, 5, 5, 2, 7, 4, 5, 6, 5, 7][i],
+        },
+      }),
+    ),
+    // Steven - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Steven").id,
+          cart_id: cartFor("Steven", 3),
+          hole_number: i + 1,
+          strokes: [5, 6, 5, 4, 4, 3, 3, 5, 4, 4, 3, 4, 3, 5, 5, 6, 4, 5][i],
+        },
+      }),
+    ),
+    // Clayton - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Clayton").id,
+          cart_id: cartFor("Clayton", 1),
+          hole_number: i + 1,
+          strokes: [5, 5, 4, 4, 4, 3, 8, 4, 5, 6, 4, 4, 6, 5, 3, 3, 5, 5][i],
+        },
+      }),
+    ),
+    // Clayton - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Clayton").id,
+          cart_id: cartFor("Clayton", 2),
+          hole_number: i + 1,
+          strokes: [5, 6, 4, 5, 5, 4, 2, 4, 5, 4, 4, 3, 4, 5, 6, 5, 4, 5][i],
+        },
+      }),
+    ),
+    // Clayton - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Clayton").id,
+          cart_id: cartFor("Clayton", 3),
+          hole_number: i + 1,
+          strokes: [4, 6, 3, 3, 7, 6, 4, 5, 5, 4, 4, 6, 2, 4, 4, 5, 3, 5][i],
+        },
+      }),
+    ),
+    // Craig - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Craig").id,
+          cart_id: cartFor("Craig", 1),
+          hole_number: i + 1,
+          strokes: [6, 5, 5, 4, 5, 4, 6, 4, 8, 4, 5, 6, 6, 5, 4, 5, 7, 5][i],
+        },
+      }),
+    ),
+    // Craig - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Craig").id,
+          cart_id: cartFor("Craig", 2),
+          hole_number: i + 1,
+          strokes: [6, 6, 5, 5, 6, 5, 4, 5, 5, 6, 2, 3, 5, 4, 7, 7, 4, 6][i],
+        },
+      }),
+    ),
+    // Craig - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Craig").id,
+          cart_id: cartFor("Craig", 3),
+          hole_number: i + 1,
+          strokes: [4, 8, 6, 3, 5, 7, 3, 3, 6, 5, 4, 5, 5, 6, 3, 6, 4, 5][i],
+        },
+      }),
+    ),
+    // Kevin - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Kevin").id,
+          cart_id: cartFor("Kevin", 1),
+          hole_number: i + 1,
+          strokes: [6, 7, 5, 4, 4, 4, 7, 4, 6, 5, 5, 4, 5, 4, 4, 5, 5, 7][i],
+        },
+      }),
+    ),
+    // Kevin - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Kevin").id,
+          cart_id: cartFor("Kevin", 2),
+          hole_number: i + 1,
+          strokes: [6, 6, 5, 4, 5, 6, 3, 5, 5, 3, 4, 3, 3, 5, 4, 4, 3, 4][i],
+        },
+      }),
+    ),
+    // Kevin - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Kevin").id,
+          cart_id: cartFor("Kevin", 3),
+          hole_number: i + 1,
+          strokes: [3, 6, 4, 3, 6, 4, 4, 3, 8, 5, 4, 8, 3, 7, 4, 5, 4, 5][i],
+        },
+      }),
+    ),
+    // Brian - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Brian").id,
+          cart_id: cartFor("Brian", 1),
+          hole_number: i + 1,
+          strokes: [6, 6, 5, 5, 5, 5, 5, 4, 9, 5, 5, 3, 9, 5, 5, 4, 5, 6][i],
+        },
+      }),
+    ),
+    // Brian - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Brian").id,
+          cart_id: cartFor("Brian", 2),
+          hole_number: i + 1,
+          strokes: [6, 4, 5, 3, 7, 4, 3, 4, 7, 3, 5, 4, 5, 4, 5, 5, 4, 8][i],
+        },
+      }),
+    ),
+    // Brian - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Brian").id,
+          cart_id: cartFor("Brian", 3),
+          hole_number: i + 1,
+          strokes: [4, 6, 6, 3, 4, 5, 4, 5, 5, 5, 4, 7, 3, 6, 5, 5, 4, 4][i],
+        },
+      }),
+    ),
+    // Dave - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Dave").id,
+          cart_id: cartFor("Dave", 1),
+          hole_number: i + 1,
+          strokes: [6, 6, 6, 5, 4, 3, 6, 3, 7, 5, 5, 6, 6, 5, 4, 4, 3, 6][i],
+        },
+      }),
+    ),
+    // Dave - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Dave").id,
+          cart_id: cartFor("Dave", 2),
+          hole_number: i + 1,
+          strokes: [4, 5, 5, 3, 6, 4, 3, 4, 5, 3, 4, 4, 6, 4, 6, 5, 4, 4][i],
+        },
+      }),
+    ),
+    // Dave - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Dave").id,
+          cart_id: cartFor("Dave", 3),
+          hole_number: i + 1,
+          strokes: [4, 5, 4, 4, 5, 6, 3, 7, 5, 4, 5, 5, 3, 4, 4, 6, 4, 5][i],
+        },
+      }),
+    ),
+    // Lorne - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Lorne").id,
+          cart_id: cartFor("Lorne", 1),
+          hole_number: i + 1,
+          strokes: [7, 3, 7, 7, 3, 3, 6, 4, 5, 7, 7, 3, 6, 4, 3, 6, 6, 5][i],
+        },
+      }),
+    ),
+    // Lorne - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Lorne").id,
+          cart_id: cartFor("Lorne", 2),
+          hole_number: i + 1,
+          strokes: [6, 4, 5, 5, 7, 4, 5, 4, 8, 4, 4, 4, 5, 4, 5, 6, 4, 6][i],
+        },
+      }),
+    ),
+    // Lorne - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Lorne").id,
+          cart_id: cartFor("Lorne", 3),
+          hole_number: i + 1,
+          strokes: [4, 6, 5, 4, 4, 4, 3, 3, 5, 5, 5, 3, 4, 5, 3, 6, 5, 5][i],
+        },
+      }),
+    ),
+    // Pete - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Pete").id,
+          cart_id: cartFor("Pete", 1),
+          hole_number: i + 1,
+          strokes: [5, 6, 5, 6, 4, 3, 4, 3, 6, 5, 4, 4, 6, 5, 5, 5, 5, 6][i],
+        },
+      }),
+    ),
+    // Pete - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Pete").id,
+          cart_id: cartFor("Pete", 2),
+          hole_number: i + 1,
+          strokes: [4, 8, 4, 3, 5, 4, 4, 4, 5, 5, 4, 3, 4, 4, 6, 4, 3, 7][i],
+        },
+      }),
+    ),
+    // Pete - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Pete").id,
+          cart_id: cartFor("Pete", 3),
+          hole_number: i + 1,
+          strokes: [5, 6, 6, 4, 5, 4, 3, 4, 4, 5, 5, 5, 3, 4, 3, 5, 4, 5][i],
+        },
+      }),
+    ),
+    // Brock - Round 1
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Brock").id,
+          cart_id: cartFor("Brock", 1),
+          hole_number: i + 1,
+          strokes: [5, 4, 6, 6, 4, 3, 5, 4, 6, 11, 6, 4, 6, 7, 4, 3, 7, 5][i],
+        },
+      }),
+    ),
+    // Brock - Round 2
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Brock").id,
+          cart_id: cartFor("Brock", 2),
+          hole_number: i + 1,
+          strokes: [5, 4, 6, 3, 5, 3, 4, 3, 6, 2, 5, 4, 5, 5, 6, 7, 5, 6][i],
+        },
+      }),
+    ),
+    // Brock - Round 3
+    ...Array.from({ length: 18 }, (_, i) =>
+      prisma.score.create({
+        data: {
+          player_id: player("Brock").id,
+          cart_id: cartFor("Brock", 3),
+          hole_number: i + 1,
+          strokes: [5, 8, 4, 4, 6, 5, 4, 4, 4, 5, 4, 4, 4, 5, 3, 5, 3, 5][i],
+        },
+      }),
+    ),
+  ]);
+
+  console.log("Created", scores.length, "scores");
 
   console.log("Seeding complete!");
 }
