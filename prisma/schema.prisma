@@ -32,6 +32,7 @@ model Player {
 
   registrations Registration[]
   scores Score[]
+  pairings Pairing[]
 }
 
 model Course {
@@ -56,6 +57,7 @@ model Round {
   course Course @relation(fields: [course_id], references: [id])
 
   carts Cart[] 
+  pairings Pairing []
 }
 
 model Team {
@@ -83,6 +85,17 @@ model Registration {
   tournament Tournament @relation(fields: [tournament_id], references: [id])
 }
 
+model Pairing {
+  id String @id @default(uuid())
+  round_id String
+  cart_id String
+  player_id String
+
+  round Round @relation(fields: [round_id], references: [id])
+  cart Cart @relation(fields: [cart_id], references: [id])
+  player Player@relation(fields: [player_id], references: [id])
+}
+
 model Cart {
   id String @id @default(uuid())
   round_id String
@@ -91,7 +104,9 @@ model Cart {
   tee_time String?
 
   round Round @relation(fields: [round_id], references: [id])
+
   scores Score []
+  pairings Pairing[]
 }
 
 model Score {

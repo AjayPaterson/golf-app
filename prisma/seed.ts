@@ -434,6 +434,21 @@ async function main() {
     return carts[index].id;
   };
 
+  const pairings = await Promise.all(
+    Object.entries(cartAssignments).map(([key, cartIndex]) => {
+      const [playerName, roundNum] = key.split("-");
+      return prisma.pairing.create({
+        data: {
+          player_id: player(playerName).id,
+          cart_id: carts[cartIndex].id,
+          round_id: round(parseInt(roundNum)).id,
+        },
+      });
+    }),
+  );
+
+  console.log("Created", pairings.length, "pairings");
+
   const scores = await Promise.all([
     // Joe - Round 1
     ...Array.from({ length: 18 }, (_, i) =>
