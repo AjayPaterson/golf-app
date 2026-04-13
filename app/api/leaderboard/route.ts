@@ -10,6 +10,13 @@ export async function GET() {
             include: {
               scores: {
                 orderBy: [{ cart_id: "asc" }, { hole_number: "asc" }],
+                include: {
+                  cart: {
+                    include: {
+                      round: true,
+                    },
+                  },
+                },
               },
             },
           },
