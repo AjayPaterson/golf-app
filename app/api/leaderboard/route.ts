@@ -13,7 +13,11 @@ export async function GET() {
                 include: {
                   cart: {
                     include: {
-                      round: true,
+                      round: {
+                        include: {
+                          course: true,
+                        },
+                      },
                     },
                   },
                 },
@@ -28,6 +32,12 @@ export async function GET() {
   const leaderboard = teams.map((team) => {
     //collect all scores across all players on this team
     const allScores = team.registrations.flatMap((reg) => reg.player.scores);
+
+    const roundPars: Record<number, number> = {};
+    allScores.forEach((score) => {
+      const roundNum = score.cart.round.round_number;
+      roundPars[roundNum] = score.cart.round.course.par;
+    });
 
     //round calculation
     const grouped = allScores.reduce((acc: Record<number, Record<number, number[]>>, score) => {
@@ -54,6 +64,7 @@ export async function GET() {
       return {
         roundNumber: Number(roundNumber),
         score: roundScore,
+        par: roundPars[Number(roundNumber)],
       };
     });
 
