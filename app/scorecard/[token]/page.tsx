@@ -50,6 +50,23 @@ export default function ScorecardPage() {
       });
   }, [token]);
 
+  async function handleScoreEntry(player_id: string, hole_number: number, strokes: number) {
+    if (!cart) return;
+
+    await fetch(`/api/scoring/${token}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        player_id,
+        cart_id: cart.id,
+        hole_number,
+        strokes: Number(strokes),
+      }),
+    });
+  }
+
   if (loading) return <div>Loading scorecard...</div>;
   if (error) return <div>{error}</div>;
 
@@ -78,10 +95,20 @@ export default function ScorecardPage() {
                 <td>{hole.hole_number}</td>
                 <td>{hole.par}</td>
                 <td>
-                  <input type="number" />
+                  <input
+                    type="number"
+                    onBlur={(e) =>
+                      handleScoreEntry(cart.pairings[0].player.id, hole.hole_number, Number(e.target.value))
+                    }
+                  />
                 </td>
                 <td>
-                  <input type="number" />
+                  <input
+                    type="number"
+                    onBlur={(e) =>
+                      handleScoreEntry(cart.pairings[1].player.id, hole.hole_number, Number(e.target.value))
+                    }
+                  />
                 </td>
               </tr>
             ))}
