@@ -97,6 +97,11 @@ export default function ScorecardPage() {
                 <td>
                   <input
                     type="number"
+                    defaultValue={
+                      cart.scores.find(
+                        (s) => s.player_id === cart.pairings[0].player.id && s.hole_number === hole.hole_number,
+                      )?.strokes ?? ""
+                    }
                     onBlur={(e) =>
                       handleScoreEntry(cart.pairings[0].player.id, hole.hole_number, Number(e.target.value))
                     }
@@ -105,6 +110,11 @@ export default function ScorecardPage() {
                 <td>
                   <input
                     type="number"
+                    defaultValue={
+                      cart.scores.find(
+                        (s) => s.player_id === cart.pairings[1].player.id && s.hole_number === hole.hole_number,
+                      )?.strokes ?? ""
+                    }
                     onBlur={(e) =>
                       handleScoreEntry(cart.pairings[1].player.id, hole.hole_number, Number(e.target.value))
                     }
