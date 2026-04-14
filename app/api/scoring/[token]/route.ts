@@ -10,7 +10,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ toke
     include: {
       round: {
         include: {
-          course: true,
+          course: {
+            include: {
+              holes: {
+                orderBy: {
+                  hole_number: "asc",
+                },
+              },
+            },
+          },
         },
       },
       pairings: {

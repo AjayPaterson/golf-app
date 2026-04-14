@@ -44,6 +44,7 @@ model Course {
   slope_rating Float
 
   rounds Round[]
+  holes Hole[]
 }
 
 model Round {
@@ -118,4 +119,14 @@ model Score {
 
   player Player @relation(fields: [player_id], references: [id])
   cart Cart @relation(fields: [cart_id], references: [id])
+}
+
+model Hole {
+  id            String @id @default(uuid())
+  course_id     String
+  hole_number   Int
+  par           Int
+  handicap_rating Int
+
+  course Course @relation(fields: [course_id], references: [id])
 }
