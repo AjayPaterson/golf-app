@@ -39,12 +39,19 @@ type Cart = {
   }[];
 };
 
+function ScoreColor({ strokes, par }: { strokes: number; par: number }) {
+  if (strokes < par) return <span className="text-green-600 font-bold font-mono text-lg">{strokes}</span>;
+  if (strokes === par) return <span className="text-black font-mono text-lg">{strokes}</span>;
+  return <span className="text-red-600 font-mono text-lg">{strokes}</span>;
+}
+
 export default function ScorecardPage() {
   const { token } = useParams();
   const [cart, setCart] = useState<Cart | null>(null);
   const [nine, setNine] = useState("front");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [enteredScores, setEnteredScores] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetch(`/api/scoring/${token}`)
@@ -93,6 +100,14 @@ export default function ScorecardPage() {
 
   const player1 = cart.pairings[0].player;
   const player2 = cart.pairings[1].player;
+
+  const getScoreColor = (key: string, par: number) => {
+    const strokes = enteredScores[key];
+    if (!strokes) return "text-black";
+    if (strokes < par) return "text-green-600";
+    if (strokes === par) return "text-black";
+    return "text-red-600";
+  };
 
   return (
     <main className="min-h-screen bg-green-950 p-6">
@@ -167,12 +182,12 @@ export default function ScorecardPage() {
               {holes.map((hole, index) => (
                 <TableRow
                   key={hole.id}
-                  className={`border-green-800 hover:bg-green-900 transition-colors ${
-                    index % 2 === 0 ? "bg-green-950" : "bg-green-900/50"
+                  className={`border-gray-200 hover:bg-gray-50 transition-colors ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50"
                   }`}
                 >
-                  <TableCell className="text-white font-bold text-center">{hole.hole_number}</TableCell>
-                  <TableCell className="text-green-400 text-center">{hole.par}</TableCell>
+                  <TableCell className="text-black font-bold text-center">{hole.hole_number}</TableCell>
+                  <TableCell className="text-gray-500 text-center">{hole.par}</TableCell>
                   <TableCell className="text-center">
                     <input
                       type="number"
@@ -180,8 +195,14 @@ export default function ScorecardPage() {
                         cart.scores.find((s) => s.player_id === player1.id && s.hole_number === hole.hole_number)
                           ?.strokes ?? ""
                       }
+                      onChange={(e) =>
+                        setEnteredScores((prev) => ({
+                          ...prev,
+                          [`${player1.id}-${hole.hole_number}`]: Number(e.target.value),
+                        }))
+                      }
                       onBlur={(e) => handleScoreEntry(player1.id, hole.hole_number, Number(e.target.value))}
-                      className="w-14 h-10 text-center text-white font-bold text-lg bg-green-800 border border-green-600 rounded-lg focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400"
+                      className={`w-14 h-10 text-center font-bold text-lg bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-green-400 ${getScoreColor(`${player1.id}-${hole.hole_number}`, hole.par)}`}
                     />
                   </TableCell>
                   <TableCell className="text-center">
@@ -191,8 +212,14 @@ export default function ScorecardPage() {
                         cart.scores.find((s) => s.player_id === player2.id && s.hole_number === hole.hole_number)
                           ?.strokes ?? ""
                       }
+                      onChange={(e) =>
+                        setEnteredScores((prev) => ({
+                          ...prev,
+                          [`${player2.id}-${hole.hole_number}`]: Number(e.target.value),
+                        }))
+                      }
                       onBlur={(e) => handleScoreEntry(player2.id, hole.hole_number, Number(e.target.value))}
-                      className="w-14 h-10 text-center text-white font-bold text-lg bg-green-800 border border-green-600 rounded-lg focus:outline-none focus:border-green-400 focus:ring-1 focus:ring-green-400"
+                      className={`w-14 h-10 text-center font-bold text-lg bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-green-400 ${getScoreColor(`${player2.id}-${hole.hole_number}`, hole.par)}`}
                     />
                   </TableCell>
                 </TableRow>
