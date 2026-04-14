@@ -40,8 +40,18 @@ export async function GET(request: Request, { params }: { params: Promise<{ toke
 export async function POST(request: Request, { params }: { params: Promise<{ token: string }> }) {
   const { player_id, cart_id, hole_number, strokes } = await request.json();
   try {
-    const score = await prisma.score.create({
-      data: {
+    const score = await prisma.score.upsert({
+      where: {
+        player_id_hole_number_cart_id: {
+          player_id,
+          hole_number,
+          cart_id,
+        },
+      },
+      update: {
+        strokes,
+      },
+      create: {
         player_id,
         cart_id,
         hole_number,

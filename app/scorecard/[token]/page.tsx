@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
 import { useParams } from "next/navigation";
+import { Table, TableHeader } from "@/components/ui/table";
 
 type Cart = {
   id: string;
@@ -57,11 +57,36 @@ export default function ScorecardPage() {
     <div>
       <h1>Tournament name</h1>
       <h2>{cart.round.course.name}</h2>
-      <h2>{cart.round.round_number}</h2>
-      <h2>{cart.cart_name}</h2>
-      <p>
-        Welcome {cart.pairings[0].player.first_name} & {cart.pairings[1].player.first_name}
-      </p>
+
+      {/* Toggle Buttons */}
+      <button onClick={() => setNine("front")}>Front 9</button>
+      <button onClick={() => setNine("back")}>Back 9</button>
+      <table>
+        <thead>
+          <tr>
+            <th>Hole</th>
+            <th>Par</th>
+            <th>{cart.pairings[0].player.first_name}</th>
+            <th>{cart.pairings[1].player.first_name}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cart.round.course.holes
+            .filter((h) => (nine === "front" ? h.hole_number <= 9 : h.hole_number > 9))
+            .map((hole) => (
+              <tr key={hole.id}>
+                <td>{hole.hole_number}</td>
+                <td>{hole.par}</td>
+                <td>
+                  <input type="number" />
+                </td>
+                <td>
+                  <input type="number" />
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
     </div>
   );
 }

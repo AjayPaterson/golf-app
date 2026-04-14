@@ -119,6 +119,8 @@ model Score {
 
   player Player @relation(fields: [player_id], references: [id])
   cart Cart @relation(fields: [cart_id], references: [id])
+
+  @@unique([player_id, hole_number, cart_id])
 }
 
 model Hole {
