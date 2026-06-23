@@ -17,10 +17,12 @@ model Player {
   first_name String
   last_name String
   handicap_index Float?
+  user_id String? @unique
 
   registrations Registration[]
   scores Score[]
   pairings Pairing[]
+  user User? @relation(fields: [user_id], references: [id])
 }
 
 model Course {
@@ -125,6 +127,7 @@ model Event{
 	tournament_details TournamentDetails?
   registrations Registration[]
   teams Team[]
+  event_organizer EventOrganizer[]
 }
 
 model TournamentDetails {	
@@ -157,4 +160,29 @@ model RegistrationDetails {
 	registration_id	String	@unique
 
 	registration Registration	@relation(fields: [registration_id], references: [id])
+}
+
+model EventOrganizer {
+  id String @id @default(uuid())
+  primary_organizer Boolean @default(true)
+  user_id String
+  event_id String
+
+  user User @relation(fields: [user_id], references: [id])
+  event Event @relation(fields: [event_id], references: [id])
+}
+
+enum ModeType {
+	light
+  dark
+}
+
+model User {
+  id String @id 
+  is_admin Boolean @default(false)
+  display_name String?
+  mode_type ModeType @default(light)
+
+  event_organizer EventOrganizer[]
+  player Player?
 }
