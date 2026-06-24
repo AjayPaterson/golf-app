@@ -12,27 +12,17 @@ datasource db {
   provider = "postgresql"
 }
 
-model Tournament {
-  id String @id @default(uuid())
-  name String
-  number_of_rounds Int
-  location String?
-  year Int
-
-  rounds Round[]
-  teams Team[]
-  registrations Registration[]
-}
-
 model Player {
   id String @id @default(uuid())
   first_name String
   last_name String
   handicap_index Float?
+  user_id String? @unique
 
   registrations Registration[]
   scores Score[]
   pairings Pairing[]
+  user User? @relation(fields: [user_id], references: [id])
 }
 
 model Course {
@@ -49,12 +39,12 @@ model Course {
 
 model Round {
   id String @id @default(uuid())
-  tournament_id String
+  event_id String
   course_id String
   round_number Int
   date DateTime
 
-  tournament Tournament @relation(fields: [tournament_id], references: [id])
+  event Event @relation(fields: [event_id], references: [id])
   course Course @relation(fields: [course_id], references: [id])
 
   carts Cart[] 
@@ -64,26 +54,12 @@ model Round {
 model Team {
   id String @id @default(uuid())
   name String?
-  tournament_id String
+  event_id String
   adjusted_handicap Int
 
-  tournament Tournament @relation(fields: [tournament_id], references: [id])
+  event Event @relation(fields: [event_id], references: [id])
 
   registrations Registration[]
-}
-
-model Registration {
-  id String @id @default(uuid())
-  player_id String
-  team_id String
-  tournament_id String
-  full_handicap Int
-  three_quarter_handicap Int
-  adjusted_handicap Int
-
-  player Player @relation(fields: [player_id], references: [id])
-  team Team @relation(fields: [team_id], references: [id])
-  tournament Tournament @relation(fields: [tournament_id], references: [id])
 }
 
 model Pairing {
@@ -94,7 +70,7 @@ model Pairing {
 
   round Round @relation(fields: [round_id], references: [id])
   cart Cart @relation(fields: [cart_id], references: [id])
-  player Player@relation(fields: [player_id], references: [id])
+  player Player @relation(fields: [player_id], references: [id])
 }
 
 model Cart {
@@ -131,4 +107,82 @@ model Hole {
   handicap_rating Int
 
   course Course @relation(fields: [course_id], references: [id])
+}
+
+enum EventType {
+	casual
+	challenge
+	league
+	tournament
+}
+
+model Event{
+	id 	String	@id @default(uuid())
+	type  EventType
+	name  String 
+	start_date DateTime
+	end_date DateTime
+	
+	rounds  Round[]
+	tournament_details TournamentDetails?
+  registrations Registration[]
+  teams Team[]
+  event_organizer EventOrganizer[]
+}
+
+model TournamentDetails {	
+	id String	@id	@default(uuid())
+	number_of_rounds	Int
+	year	Int
+
+	event_id	String	@unique
+	event	Event @relation(fields: [event_id], references: [id])
+}
+
+model Registration {
+	id	String	@id	@default(uuid())
+	player_id	String
+	event_id	String
+	team_id String?
+	
+	player Player	@relation(fields: [player_id], references: [id])
+	event Event	@relation(fields: [event_id], references: [id])
+	team Team?	@relation(fields: [team_id], references: [id])
+	
+	registration_details RegistrationDetails?
+}
+
+model RegistrationDetails {
+	id	String	@id	@default(uuid())
+	full_handicap	Int
+	three_quarter_handicap	Int
+	adjusted_handicap	Int
+	registration_id	String	@unique
+
+	registration Registration	@relation(fields: [registration_id], references: [id])
+}
+
+model EventOrganizer {
+  id String @id @default(uuid())
+  primary_organizer Boolean @default(true)
+  user_id String
+  event_id String
+
+  user User @relation(fields: [user_id], references: [id])
+  event Event @relation(fields: [event_id], references: [id])
+}
+
+enum ModeType {
+	light
+  dark
+}
+
+model User {
+  id String @id 
+  is_admin Boolean @default(false)
+  display_name String?
+  mode_type ModeType @default(light)
+
+  event_organizer EventOrganizer[]
+  player Player?
 }
