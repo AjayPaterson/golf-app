@@ -2,6 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginForm() {
     const [email, setEmail] = useState('')
@@ -38,13 +42,17 @@ export default function LoginForm() {
     }
 
     return (
-        <div>
-            <h1>Login</h1>
+        <div className="h-screen flex items-center justify-center">
+            <Card className="w-full max-w-md p-6">
+            <CardHeader>
+            <CardTitle>Login</CardTitle>
+            </CardHeader>
+            <CardContent>
             {error && <p style={{ color: 'red'}}>{error}</p>}
             <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="email">Email</label>
-                    <input
+                    <Label htmlFor="email">Email</Label>
+                    <Input
                     id="email"
                     type="email"
                     value={email}
@@ -52,18 +60,20 @@ export default function LoginForm() {
                 />
                 </div>
                 <div>
-                    <label htmlFor="password">Password</label>
-                    <input
+                    <Label htmlFor="password">Password</Label>
+                    <Input
                     id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     />
                 </div>
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Logging up...' : 'Log In'}
-                </button>
+                <Button type="submit" disabled={loading}>
+                    {loading ? 'Log in...' : 'Log In'}
+                </Button>
             </form>
+            </CardContent>
+            </Card>
         </div>
     ) 
 }
