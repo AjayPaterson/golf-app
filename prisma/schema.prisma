@@ -29,12 +29,22 @@ model Course {
   id String @id @default(uuid())
   name String
   location String
-  par Int
-  course_rating Float
-  slope_rating Float
 
   rounds Round[]
   holes Hole[]
+  tees Tee[]
+}
+
+model Tee {
+  id  String @id @default(uuid())
+  course_id String
+  name  String  // "red", "white", "blue", etc.
+  yardage Int
+  course_rating Float
+  slope_rating  Float
+
+  course Course @relation(fields: [course_id], references: [id])
+  pairings Pairing[]
 }
 
 model Round {
@@ -67,10 +77,12 @@ model Pairing {
   round_id String
   cart_id String
   player_id String
+  tee_id  String?  
 
   round Round @relation(fields: [round_id], references: [id])
   cart Cart @relation(fields: [cart_id], references: [id])
   player Player @relation(fields: [player_id], references: [id])
+  tee Tee? @relation(fields: [tee_id], references: [id])
 }
 
 model Cart {
@@ -122,6 +134,7 @@ model Event{
 	name  String 
 	start_date DateTime
 	end_date DateTime
+  play_format PlayFormat
 	
 	rounds  Round[]
 	tournament_details TournamentDetails?
@@ -150,6 +163,7 @@ model Registration {
 	team Team?	@relation(fields: [team_id], references: [id])
 	
 	registration_details RegistrationDetails?
+  casual_registration_details CasualRegistrationDetails?
 }
 
 model RegistrationDetails {
@@ -185,4 +199,22 @@ model User {
 
   event_organizer EventOrganizer[]
   player Player?
+}
+
+enum PlayFormat {
+  stroke_play
+  match_play
+  best_ball
+  scramble
+  stableford
+}
+
+model CasualRegistrationDetails {
+  id  String @id  @default(uuid())
+  play_format PlayFormat
+  stroke_allowance  Int?
+  registration_id String @unique
+  
+
+  registration Registration @relation(fields: [registration_id], references: [id])
 }
