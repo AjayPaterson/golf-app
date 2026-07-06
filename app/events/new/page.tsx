@@ -209,7 +209,6 @@ export default function NewEventPage() {
             ...formData,
             name: formData.name || `Casual Round - ${new Date().toLocaleDateString()}`
         }
-        console.log('formData:', formData)
     try {
         const response = await fetch('/api/events', {
             method: 'POST',
