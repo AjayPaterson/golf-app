@@ -13,6 +13,13 @@ type Course = {
     location: string
 }
 
+type Player = {
+    id: string
+    first_name: string
+    last_name: string
+    handicap_index: number | null
+}
+
 const initialFormData = {
     name: '',
     start_date: '',
@@ -21,10 +28,15 @@ const initialFormData = {
     players: [] as string[]
 }
 
+
 function StepOne({ formData, setFormData }: {
     formData: typeof initialFormData,
     setFormData: React.Dispatch<React.SetStateAction<typeof initialFormData>>
     }) {
+
+    const today = new Date()
+    const [placeholderName] = useState(`Casual Round - ${today.getMonth() + 1}/${today.getDate()}/${today.getFullYear()}`)
+
  return (
         <div className="space-y-4">
             <div className="space-y-2">
@@ -34,7 +46,7 @@ function StepOne({ formData, setFormData }: {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value})}
-                    placeholder={`Casual Round - ${new Date().toLocaleDateString()}`}
+                    placeholder= {placeholderName}
                 />
             </div>
             <div className="space-y-2">
@@ -70,6 +82,7 @@ function StepTwo({ formData, setFormData }: {
     formData: typeof initialFormData,
     setFormData: React.Dispatch<React.SetStateAction<typeof initialFormData>>
     }) {
+
     const [courses, setCourses] = useState<Course[]>([])
 
     useEffect(() => {
@@ -100,17 +113,136 @@ function StepTwo({ formData, setFormData }: {
         </div>
     )
 }
-   
 
+
+function StepThree({ formData, setFormData }: {
+    formData: typeof initialFormData,
+    setFormData: React.Dispatch<React.SetStateAction<typeof initialFormData>>
+    }) {
+
+    const [ search, setSearch ] = useState('')
+    const [ results, setResults ] = useState<Player[]>([])
+    const [ selectedPlayers, setSelectedPlayers ] = useState<Player[]>([])
+
+    useEffect(() => {
+        async function searchPlayers() {
+            const response = await fetch (`/api/players?search=${search}`)
+            const data = await response.json()
+            console.log('Search results:', data)
+            setResults(data)
+        }
+        searchPlayers()
+    }, [search])
+
+    useEffect(() => {
+        setFormData(prev => ({
+            ...prev,
+            players: selectedPlayers.map(p => p.id)
+        }))
+    }, [selectedPlayers])
+
+    function addPlayer(player: Player) {
+        if (!selectedPlayers.find(p=> p.id === player.id)) {
+            setSelectedPlayers([...selectedPlayers, player])
+        }
+    }
+
+    return (
+        <div className="space-y-4">
+            <div className="space-y-2">
+                <Label htmlFor="search">Search Players</Label>
+                <Input 
+                    id="search"
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+                </div>
+
+                {/* Search Results */}
+                {results.length > 0 && (
+                    <div className="space-y-1">
+                        {results.map((player) => (
+                            <div
+                                key={player.id}
+                                onClick={() => addPlayer(player)}
+                                className="cursor-pointer p-2 hover:bg-gray-100 rounded"
+                            >
+                                {player.first_name} {player.last_name}
+                                {player.handicap_index && ` (HCP: ${player.handicap_index})`}
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* Selected Players */}
+                {selectedPlayers.length > 0 && (
+                    <div className="space-y-2">
+                        <Label>Added Players</Label>
+                        {selectedPlayers.map((player) => (
+                            <div key={player.id} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                <span>{player.first_name} {player.last_name}</span>
+                                <button 
+                                    onClick={() => setSelectedPlayers(selectedPlayers.filter(p => p.id !== player.id))}
+                                    className="text-red-500 text-sm"
+                                >
+                                Remove
+                                </button>
+                            </div>    
+                        ))}
+                    </div>
+                )}  
+            </div>
+    )
+}
+   
 
 export default function NewEventPage() {
     const [step, setStep] = useState(1)
     const [formData, setFormData] = useState(initialFormData)
+    const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
+    const router = useRouter()
+
+    async function handleSubmit() {
+        const submittedData = {
+            ...formData,
+            name: formData.name || `Casual Round - ${new Date().toLocaleDateString()}`
+        }
+        console.log('formData:', formData)
+    try {
+        const response = await fetch('/api/events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                name: submittedData.name,
+                start_date: formData.start_date,
+                play_format: formData.play_format,
+                course_id: formData.course_id,
+                player_ids: formData.players,
+            })
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+            setError(data.error || "Something went wrong")
+            return
+        }
+
+        router.push('/')
+    } catch (err) {
+        setError("Soemthing went wrong, please try again")
+    } finally {
+        setLoading(false)
+    }
+
+}
 
     function renderStep() {
         if(step === 1) return <StepOne formData={formData} setFormData={setFormData} />
         if(step === 2) return <StepTwo formData={formData} setFormData={setFormData}/>
-        if(step === 3) return <div>Step 3 - Players</div>
+        if(step === 3) return <StepThree formData={formData} setFormData={setFormData}/>
     }
 
     return (
@@ -120,6 +252,7 @@ export default function NewEventPage() {
                     <CardTitle>Create New Event</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                    {error && <p className="text-red-500 text-sm">{error}</p>}
                     {renderStep()}
                     <div className="flex justify-between">
                         {step > 1 && (
@@ -133,8 +266,7 @@ export default function NewEventPage() {
                         )}
                     </div>
                 </CardContent>
-            </Card>
-            
+            </Card> 
         </div>
     )
 }
