@@ -128,7 +128,6 @@ function StepThree({ formData, setFormData }: {
         async function searchPlayers() {
             const response = await fetch (`/api/players?search=${search}`)
             const data = await response.json()
-            console.log('Search results:', data)
             setResults(data)
         }
         searchPlayers()
